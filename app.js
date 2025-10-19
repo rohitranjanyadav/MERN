@@ -1,5 +1,8 @@
 const express = require("express");
+const connectToDatabase = require("./database");
 const app = express();
+
+connectToDatabase();
 
 app.get("/", (req, res) => {
   res.json({ message: "This is Homepage" });
