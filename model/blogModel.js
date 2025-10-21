@@ -11,7 +11,7 @@ const blogSchema = new Schema({
     type: String,
   },
   description: {
-    type: Text,
+    type: String,
   },
   image: {
     type: String,
