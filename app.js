@@ -12,8 +12,15 @@ app.get("/", (req, res) => {
   res.json({ message: "This is Homepage" });
 });
 
-app.post("/blog",async (req, res) => {
+app.post("/blog", async (req, res) => {
   const { title, subtitle, description, image } = req.body;
+
+  if (!title || !subtitle || !description || !image) {
+    return res.status(400).json({
+      message: "All fields are required",
+    });
+  }
+
   await Blog.create({
     title: title,
     subtitle: subtitle,
