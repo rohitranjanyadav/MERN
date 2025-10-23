@@ -16,9 +16,9 @@ app.get("/", (req, res) => {
 
 app.post("/blog", upload.single("image"), async (req, res) => {
   const { title, subtitle, description } = req.body;
-  const image = req.file ? req.file.filename : null;
+  const filename = req.file.filename;
 
-  if (!title || !subtitle || !description || !image) {
+  if (!title || !subtitle || !description) {
     return res.status(400).json({
       message: "All fields are required",
     });
@@ -28,13 +28,23 @@ app.post("/blog", upload.single("image"), async (req, res) => {
     title: title,
     subtitle: subtitle,
     description: description,
-    image: image,
+    image: filename,
   });
 
   res.status(200).json({
     message: "Blog API hit successfully",
   });
 });
+
+app.get("/blog", async (req, res) => {
+  const blogs = await Blog.find();
+  res.status(200).json({
+    message: "Blogs fetched successfully",
+    data: blogs,
+  });
+});
+
+app.use(express.static("./storage"));
 
 app.listen(process.env.PORT, () => {
   console.log("NodeJS project has started");
