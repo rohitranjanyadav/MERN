@@ -9,9 +9,11 @@ const { multer, storage } = require("./middleware/multerConfig");
 const upload = multer({ storage: storage });
 const cors = require("cors");
 
-app.use(cors({
-  origin: "http://localhost:5173"
-}))
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
 
 connectToDatabase();
 
@@ -47,6 +49,28 @@ app.get("/blog", async (req, res) => {
     message: "Blogs fetched successfully",
     data: blogs,
   });
+});
+
+app.get("/blog/:id", async (req, res) => {
+  const id = req.params.id;
+  const blog = await Blog.findById(id);
+  if (!blog) {
+    return res.status(404).json({
+      message: "No blog found",
+    });
+  }
+  res.status(200).json({
+    message: "Fetched successfully",
+    data: blog,
+  });
+});
+
+app.delete("/blog/:id", async (req, res) => {
+  const id = req.params.id;
+  await Blog.findByIdAndDelete(id);
+  res.status(200).json({
+    message:"Blog Deleted Successfully"
+  })
 });
 
 app.use(express.static("./storage"));
