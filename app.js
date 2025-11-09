@@ -24,7 +24,12 @@ app.get("/", (req, res) => {
 
 app.post("/blog", upload.single("image"), async (req, res) => {
   const { title, subtitle, description } = req.body;
-  const filename = req.file.filename;
+  let filename;
+  if (req.file) {
+    filename = `http://localhost:3000/${req.file.filename}`
+  }else {
+    filename="https://www.chitkara.edu.in/blogs/wp-content/uploads/2023/09/Blogging-in-Digital-Marketing.jpg"
+  }
 
   if (!title || !subtitle || !description) {
     return res.status(400).json({
@@ -102,7 +107,7 @@ app.patch("/blog/:id", upload.single("image"), async (req, res) => {
     title: title,
     subtitle: subtitle,
     description: description,
-    image:imageName
+    image: imageName,
   });
   res.status(200).json({
     message: "Blog Updated successfully",
