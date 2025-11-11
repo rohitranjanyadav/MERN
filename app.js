@@ -12,7 +12,7 @@ const cors = require("cors");
 
 app.use(
   cors({
-    origin: ["http://localhost:5173","blogspot-umber.vercel.app"]
+    origin: ["http://localhost:5173", "blogspot-umber.vercel.app"],
   })
 );
 
@@ -26,9 +26,10 @@ app.post("/blog", upload.single("image"), async (req, res) => {
   const { title, subtitle, description } = req.body;
   let filename;
   if (req.file) {
-    filename = `storage/${req.file.filename}`
-  }else {
-    filename="https://www.chitkara.edu.in/blogs/wp-content/uploads/2023/09/Blogging-in-Digital-Marketing.jpg"
+    filename = req.file.filename;
+  } else {
+    filename =
+      "https://www.chitkara.edu.in/blogs/wp-content/uploads/2023/09/Blogging-in-Digital-Marketing.jpg";
   }
 
   if (!title || !subtitle || !description) {
@@ -74,44 +75,46 @@ app.get("/blog/:id", async (req, res) => {
 app.delete("/blog/:id", async (req, res) => {
   const id = req.params.id;
   const blog = await Blog.findByIdAndDelete(id);
-  const imageName = blog.image;
-  fs.unlink(`storage/${imageName}`, (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("File deleted successfully");
-    }
-  });
-  res.status(200).json({
-    message: "Blog Deleted Successfully",
-  });
+  if (!blog) return res.status(404).json({ message: "Blog not found" });
+
+  const imageName = blog.image.includes("storage/")
+    ? blog.image.split("storage/")[1]
+    : blog.image;
+
+  if (fs.existsSync(`storage/${imageName}`)) {
+    fs.unlink(`storage/${imageName}`, (err) => {
+      if (err) console.log("Delete error:", err);
+      else console.log("File deleted successfully");
+    });
+  }
+
+  res.status(200).json({ message: "Blog deleted successfully" });
 });
 
 app.patch("/blog/:id", upload.single("image"), async (req, res) => {
   const id = req.params.id;
   const { title, subtitle, description } = req.body;
   let imageName;
+
   if (req.file) {
-    imageName =  `blogspot-umber.vercel.app/${req.file.filename}`
+    imageName = req.file.filename;
     const blog = await Blog.findById(id);
-    const oldImageName = blog.image;
-    fs.unlink(`storage/${oldImageName}`, (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("File deleted successfully");
-      }
-    });
+    if (blog && blog.image && fs.existsSync(`storage/${blog.image}`)) {
+      fs.unlink(`storage/${blog.image}`, (err) => {
+        if (err) console.log(err);
+        else console.log("Old image deleted");
+      });
+    }
   }
+
   await Blog.findByIdAndUpdate(id, {
-    title: title,
-    subtitle: subtitle,
-    description: description,
-    image: imageName,
+    title,
+    subtitle,
+    description,
+    ...(imageName && { image: imageName }),
   });
-  res.status(200).json({
-    message: "Blog Updated successfully",
-  });
+
+  res.status(200).json({ message: "Blog updated successfully" });
 });
 
 app.use(express.static("./storage"));
