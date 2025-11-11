@@ -26,7 +26,7 @@ app.post("/blog", upload.single("image"), async (req, res) => {
   const { title, subtitle, description } = req.body;
   let filename;
   if (req.file) {
-    filename = `blogspot-umber.vercel.app/${req.file.filename}`
+    filename = `storage/${req.file.filename}`
   }else {
     filename="https://www.chitkara.edu.in/blogs/wp-content/uploads/2023/09/Blogging-in-Digital-Marketing.jpg"
   }
