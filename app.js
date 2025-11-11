@@ -26,7 +26,7 @@ app.post("/blog", upload.single("image"), async (req, res) => {
   const { title, subtitle, description } = req.body;
   let filename;
   if (req.file) {
-    filename = `http://localhost:3000/${req.file.filename}`
+    filename = `blogspot-umber.vercel.app/${req.file.filename}`
   }else {
     filename="https://www.chitkara.edu.in/blogs/wp-content/uploads/2023/09/Blogging-in-Digital-Marketing.jpg"
   }
@@ -92,7 +92,7 @@ app.patch("/blog/:id", upload.single("image"), async (req, res) => {
   const { title, subtitle, description } = req.body;
   let imageName;
   if (req.file) {
-    imageName =  `http://localhost:3000/${req.file.filename}`
+    imageName =  `blogspot-umber.vercel.app/${req.file.filename}`
     const blog = await Blog.findById(id);
     const oldImageName = blog.image;
     fs.unlink(`storage/${oldImageName}`, (err) => {
